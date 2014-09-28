@@ -53,6 +53,7 @@ include("reduce.jl")
 
 include("subarray.jl")
 include("array.jl")
+include("subarray2.jl")
 include("bitarray.jl")
 include("intset.jl")
 include("dict.jl")
