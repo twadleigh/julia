@@ -62,11 +62,11 @@ $(BUILDROOT)/doc/_build/html:
 CLEAN_TARGETS += clean-docdir
 clean-docdir:
 	@-rm -fr $(abspath $(build_docdir))
-$(build_prefix)/.examples: $(wildcard $(JULIAHOME)/examples/*.jl) $(shell find $(JULIAHOME)/examples/clustermanager)
+$(build_prefix)/.examples: $(wildcard $(JULIAHOME)/examples/*.jl) $(wildcard $(JULIAHOME)/examples/*.c) $(JULIAHOME)/examples/Makefile $(shell find $(JULIAHOME)/examples/clustermanager)
 	@echo Copying in usr/share/doc/julia/examples
 	@-rm -fr $(build_docdir)/examples
 	@mkdir -p $(build_docdir)/examples
-	@cp -R $(JULIAHOME)/examples/*.jl $(build_docdir)/examples/
+	@cp -R $(JULIAHOME)/examples/*.jl $(JULIAHOME)/examples/*.c $(JULIAHOME)/examples/Makefile $(build_docdir)/examples/
 	@cp -R $(JULIAHOME)/examples/clustermanager $(build_docdir)/examples/
 	@echo 1 > $@
 

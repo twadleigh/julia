@@ -23,6 +23,10 @@ JL_DLLEXPORT char * __cdecl dirname(char *);
 #include <libgen.h>
 #endif
 
+#if !defined(_OS_WINDOWS_)
+#include <dlfcn.h>
+#endif
+
 JL_DLLEXPORT int jl_is_initialized(void) { return jl_main_module!=NULL; }
 
 // First argument is the usr/lib directory where libjulia is, or NULL to guess.
@@ -254,6 +258,25 @@ JL_DLLEXPORT jl_value_t *jl_get_julia_home(void)
 JL_DLLEXPORT jl_value_t *jl_get_julia_bin(void)
 {
     return jl_cstr_to_string(jl_options.julia_bin);
+}
+
+JL_DLLEXPORT jl_value_t *jl_get_julia_lib(void)
+{
+    char lib_path[PATH_MAX];
+#ifdef _OS_WINDOWS_
+    HMODULE hModule = NULL;
+    if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+                           (LPCTSTR)jl_get_julia_lib,
+                           &hModule)) return jl_nothing;
+    GetModuleFileNameA(hModule, lib_path, PATH_MAX);
+    if(GetLastError() != ERROR_SUCCESS) return jl_nothing;
+#else /* POSIX */
+    Dl_info ifo;
+    if(!dladdr((void*)jl_get_julia_lib, &ifo)) return jl_nothing;
+    if(strlen(ifo.dli_fname) >= PATH_MAX) return jl_nothing;
+    strcpy(lib_path, ifo.dli_fname);
+#endif
+    return jl_cstr_to_string(lib_path);
 }
 
 JL_DLLEXPORT jl_value_t *jl_get_image_file(void)
